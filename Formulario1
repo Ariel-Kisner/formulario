@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+        }
+        
+        input:invalid {
+            border-color: #e74c3c;
+        }
+        
+        input:valid {
+            border-color: #2ecc71;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #357abD;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .success-message {
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Usuário</h1>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="nome" class="required">Nome completo</label>
+                <input type="text" id="nome" name="nome" required minlength="3" maxlength="100">
+                <div class="error" id="nomeError">Por favor, insira um nome válido (mínimo 3 caracteres)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="required">E-mail</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError">Por favor, insira um e-mail válido</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="senha" class="required">Senha</label>
+                <input type="password" id="senha" name="senha" required minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$">
+                <div class="error" id="senhaError">A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula e um número</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmarSenha" class="required">Confirmar senha</label>
+                <input type="password" id="confirmarSenha" name="confirmarSenha" required>
+                <div class="error" id="confirmarSenhaError">As senhas não coincidem</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone" pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}">
+                <div class="error" id="telefoneError">Formato: (XX) XXXXX-XXXX</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dataNascimento" class="required">Data de nascimento</label>
+                <input type="date" id="dataNascimento" name="dataNascimento" required max="2023-12-31">
+                <div class="error" id="dataNascimentoError">Por favor, insira uma data válida</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="genero">Gênero</label>
+                <select id="genero" name="genero">
+                    <option value="">Selecione...</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="outro">Outro</option>
+                    <option value="prefiro-nao-informar">Prefiro não informar</option>
+                </select>
+            </div>
+            
+            <button type="submit">Cadastrar</button>
+        </form>
+        
+        <div class="success-message" id="successMessage">
+            Cadastro realizado com sucesso!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const senha = document.getElementById('senha');
+            const confirmarSenha = document.getElementById('confirmarSenha');
+            
+            // Validação em tempo real da confirmação de senha
+            confirmarSenha.addEventListener('input', function() {
+                if (senha.value !== confirmarSenha.value) {
+                    confirmarSenha.setCustomValidity('As senhas não coincidem');
+                    document.getElementById('confirmarSenhaError').style.display = 'block';
+                } else {
+                    confirmarSenha.setCustomValidity('');
+                    document.getElementById('confirmarSenhaError').style.display = 'none';
+                }
+            });
+            
+            // Validação do formulário
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                if (!form.checkValidity()) {
+                    // Mostrar mensagens de erro para todos os campos inválidos
+                    const campos = form.querySelectorAll('input:invalid');
+                    campos.forEach(campo => {
+                        const errorElement = document.getElementById(campo.id + 'Error');
+                        if (errorElement) {
+                            errorElement.style.display = 'block';
+                        }
+                    });
+                } else {
+                    // Formulário válido - mostrar mensagem de sucesso
+                    form.style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Aqui você normalmente enviaria os dados para o servidor
+                    console.log('Formulário válido. Dados:');
+                    console.log('Nome:', document.getElementById('nome').value);
+                    console.log('E-mail:', document.getElementById('email').value);
+                    console.log('Data de Nascimento:', document.getElementById('dataNascimento').value);
+                }
+            });
+            
+            // Esconder mensagens de erro quando o usuário começar a digitar
+            const campos = form.querySelectorAll('input');
+            campos.forEach(campo => {
+                campo.addEventListener('input', function() {
+                    const errorElement = document.getElementById(this.id + 'Error');
+                    if (errorElement) {
+                        errorElement.style.display = 'none';
+                    }
+                    this.setCustomValidity('');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
