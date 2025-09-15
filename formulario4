@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro com Validação de Senha</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #2d3a80;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+            box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .requirement-list {
+            margin-top: 8px;
+            padding-left: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .requirement-item {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+        
+        .requirement-item.valid {
+            color: #28a745;
+        }
+        
+        .requirement-item.invalid {
+            color: #dc3545;
+        }
+        
+        .requirement-icon {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3b5be3;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .password-match {
+            display: none;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Criar Conta</h1>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required placeholder="Seu e-mail">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required placeholder="Crie uma senha segura">
+                    <button type="button" class="toggle-password" id="togglePassword">Mostrar</button>
+                </div>
+                
+                <div class="requirement-list">
+                    <div class="requirement-item" id="length">
+                        <span class="requirement-icon">⏺</span>
+                        Mínimo de 8 caracteres
+                    </div>
+                    <div class="requirement-item" id="uppercase">
+                        <span class="requirement-icon">⏺</span>
+                        Pelo menos uma letra maiúscula
+                    </div>
+                    <div class="requirement-item" id="number">
+                        <span class="requirement-icon">⏺</span>
+                        Pelo menos um número
+                    </div>
+                    <div class="requirement-item" id="special">
+                        <span class="requirement-icon">⏺</span>
+                        Pelo menos um caractere especial
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Senha</label>
+                <div class="password-container">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Digite a senha novamente">
+                    <button type="button" class="toggle-password" id="toggleConfirmPassword">Mostrar</button>
+                </div>
+                <div class="error-message" id="passwordError">As senhas não coincidem.</div>
+                <div class="success-message" id="passwordSuccess">Senhas coincidem!</div>
+            </div>
+            
+            <button type="submit" id="submitButton" disabled>Cadastrar</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const togglePasswordButton = document.getElementById('togglePassword');
+            const toggleConfirmPasswordButton = document.getElementById('toggleConfirmPassword');
+            const passwordError = document.getElementById('passwordError');
+            const passwordSuccess = document.getElementById('passwordSuccess');
+            const submitButton = document.getElementById('submitButton');
+            const form = document.getElementById('registrationForm');
+            
+            // Elementos dos requisitos de senha
+            const lengthReq = document.getElementById('length');
+            const uppercaseReq = document.getElementById('uppercase');
+            const numberReq = document.getElementById('number');
+            const specialReq = document.getElementById('special');
+            
+            // Mostrar/ocultar senha
+            togglePasswordButton.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePasswordButton.textContent = 'Ocultar';
+                } else {
+                    passwordInput.type = 'password';
+                    togglePasswordButton.textContent = 'Mostrar';
+                }
+            });
+            
+            // Mostrar/ocultar confirmação de senha
+            toggleConfirmPasswordButton.addEventListener('click', function() {
+                if (confirmPasswordInput.type === 'password') {
+                    confirmPasswordInput.type = 'text';
+                    toggleConfirmPasswordButton.textContent = 'Ocultar';
+                } else {
+                    confirmPasswordInput.type = 'password';
+                    toggleConfirmPasswordButton.textContent = 'Mostrar';
+                }
+            });
+            
+            // Validar força da senha
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                
+                // Validar comprimento
+                if (password.length >= 8) {
+                    lengthReq.classList.add('valid');
+                    lengthReq.classList.remove('invalid');
+                } else {
+                    lengthReq.classList.remove('valid');
+                    lengthReq.classList.add('invalid');
+                }
+                
+                // Validar letra maiúscula
+                if (/[A-Z]/.test(password)) {
+                    uppercaseReq.classList.add('valid');
+                    uppercaseReq.classList.remove('invalid');
+                } else {
+                    uppercaseReq.classList.remove('valid');
+                    uppercaseReq.classList.add('invalid');
+                }
+                
+                // Validar número
+                if (/[0-9]/.test(password)) {
+                    numberReq.classList.add('valid');
+                    numberReq.classList.remove('invalid');
+                } else {
+                    numberReq.classList.remove('valid');
+                    numberReq.classList.add('invalid');
+                }
+                
+                // Validar caractere especial
+                if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                    specialReq.classList.add('valid');
+                    specialReq.classList.remove('invalid');
+                } else {
+                    specialReq.classList.remove('valid');
+                    specialReq.classList.add('invalid');
+                }
+                
+                // Verificar se as senhas coincidem (se a confirmação já foi preenchida)
+                if (confirmPasswordInput.value) {
+                    validatePasswordMatch();
+                }
+                
+                updateSubmitButton();
+            });
+            
+            // Validar correspondência de senhas
+            confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+            
+            function validatePasswordMatch() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    passwordError.style.display = 'block';
+                    passwordSuccess.style.display = 'none';
+                    confirmPasswordInput.style.borderColor = '#dc3545';
+                } else if (confirmPassword && password === confirmPassword) {
+                    passwordError.style.display = 'none';
+                    passwordSuccess.style.display = 'block';
+                    confirmPasswordInput.style.borderColor = '#28a745';
+                } else {
+                    passwordError.style.display = 'none';
+                    passwordSuccess.style.display = 'none';
+                    confirmPasswordInput.style.borderColor = '#ddd';
+                }
+                
+                updateSubmitButton();
+            }
+            
+            function updateSubmitButton() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                // Verificar se todos os requisitos são atendidos
+                const isLengthValid = password.length >= 8;
+                const isUppercaseValid = /[A-Z]/.test(password);
+                const isNumberValid = /[0-9]/.test(password);
+                const isSpecialValid = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+                
+                // Habilitar o botão apenas se todos os requisitos forem atendidos e as senhas coincidirem
+                if (isLengthValid && isUppercaseValid && isNumberValid && isSpecialValid && 
+                    password === confirmPassword && confirmPassword !== '') {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
+                }
+            }
+            
+            // Envio do formulário
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simular envio bem-sucedido
+                alert('Cadastro realizado com sucesso!');
+                form.reset();
+                
+                // Resetar estados visuais
+                lengthReq.classList.remove('valid', 'invalid');
+                uppercaseReq.classList.remove('valid', 'invalid');
+                numberReq.classList.remove('valid', 'invalid');
+                specialReq.classList.remove('valid', 'invalid');
+                
+                passwordError.style.display = 'none';
+                passwordSuccess.style.display = 'none';
+                
+                confirmPasswordInput.style.borderColor = '#ddd';
+                submitButton.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>
