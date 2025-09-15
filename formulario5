@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário com Campo de CEP</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        input.error {
+            border-color: #e74c3c;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #357abD;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+        
+        .format-example {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Formulário de Endereço</h1>
+        <form id="cepForm">
+            <div class="form-group">
+                <label for="cep">CEP</label>
+                <div class="input-container">
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9">
+                </div>
+                <div class="format-example">Formato: 00000-000</div>
+                <div class="error-message" id="cepError">Por favor, insira um CEP válido no formato 00000-000</div>
+            </div>
+            
+            <button type="submit">Enviar</button>
+        </form>
+        
+        <div class="success-message" id="successMessage">
+            CEP enviado com sucesso!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cepInput = document.getElementById('cep');
+            const cepError = document.getElementById('cepError');
+            const cepForm = document.getElementById('cepForm');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Formata o CEP enquanto o usuário digita
+            cepInput.addEventListener('input', function(e) {
+                // Remove tudo que não é número
+                let value = e.target.value.replace(/\D/g, '');
+                
+                // Adiciona o hífen após 5 dígitos
+                if (value.length > 5) {
+                    value = value.substring(0, 5) + '-' + value.substring(5, 8);
+                }
+                
+                // Atualiza o valor do campo
+                e.target.value = value;
+                
+                // Valida o CEP
+                validateCEP(value);
+            });
+            
+            // Valida o CEP quando o campo perde o foco
+            cepInput.addEventListener('blur', function() {
+                validateCEP(cepInput.value);
+            });
+            
+            // Validação do formulário
+            cepForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateCEP(cepInput.value)) {
+                    // Se o CEP for válido, mostra mensagem de sucesso
+                    successMessage.style.display = 'block';
+                    cepError.style.display = 'none';
+                    
+                    // Limpa o formulário após 2 segundos
+                    setTimeout(function() {
+                        cepForm.reset();
+                        successMessage.style.display = 'none';
+                    }, 2000);
+                } else {
+                    // Se o CEP for inválido, mostra mensagem de erro
+                    cepError.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            });
+            
+            // Função para validar o formato do CEP
+            function validateCEP(cep) {
+                const cepRegex = /^\d{5}-\d{3}$/;
+                
+                if (cepRegex.test(cep)) {
+                    cepInput.classList.remove('error');
+                    cepError.style.display = 'none';
+                    return true;
+                } else {
+                    cepInput.classList.add('error');
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
