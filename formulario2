@@ -191,21 +191,7 @@
                     <span class="status-icon"></span>
                     <div class="error-message">Por favor, insira um e-mail válido</div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="senha" class="required">Senha</label>
-                    <input type="password" id="senha" name="senha" required minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$">
-                    <span class="status-icon"></span>
-                    <div class="error-message">A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula e um número</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmarSenha" class="required">Confirmar senha</label>
-                    <input type="password" id="confirmarSenha" name="confirmarSenha" required>
-                    <span class="status-icon"></span>
-                    <div class="error-message">As senhas não coincidem</div>
-                </div>
-                
+
                 <div class="form-group">
                     <label for="telefone">Telefone</label>
                     <input type="tel" id="telefone" name="telefone" pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}">
